@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>내 차 도우미</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f4f6f9">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="내 차 도우미">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
 <style>
 /* Layout: clean light app. Cool gray page, borderless white cards with a soft shadow, filled color icons. Home shows four task tiles, a search and shortcuts; each task opens its own step-by-step screen. */
@@ -292,6 +299,14 @@ body { background: var(--page); }
 .plug { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--bg); font-size: 13px; font-weight: 600; color: var(--muted); }
 .plug.ok { color: var(--ok); background: var(--ok-soft); } .plug.busy { color: var(--soon); background: var(--soon-soft); } .plug.off { color: var(--muted); }
 
+.install { margin-top: 20px; display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; align-items: center; }
+.install b { display: block; font-size: 16px; }
+.install span { font-size: 14px; color: var(--muted); }
+.install #installHelp { grid-column: 1 / -1; font-size: 14.5px; }
+.install #installHelp:empty { display: none; }
+.install ol { list-style: decimal; padding-left: 20px; display: grid; gap: 4px; }
+@media (max-width: 420px) { .install { grid-template-columns: 1fr; } .install .btn { width: 100%; } }
+
 @media (max-width: 860px) {
   .nav { display: none; }
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -419,6 +434,23 @@ body { background: var(--page); }
     car: fi("d", "#7fb3ff", "#2563eb", '<path d="M11 21l3.600-9.200A5 5 0 0 1 19.300 8.600h9.400a5 5 0 0 1 4.700 3.200L37 21z" fill="#bfdbfe"/><rect x="4" y="19" width="40" height="17" rx="6" fill="GR"/><rect x="8" y="34" width="8" height="8" rx="3" fill="#1e3a8a"/><rect x="32" y="34" width="8" height="8" rx="3" fill="#1e3a8a"/><rect x="8" y="24" width="8" height="4.500" rx="2.250" fill="#fde68a"/><rect x="32" y="24" width="8" height="4.500" rx="2.250" fill="#fde68a"/><rect x="19" y="28" width="10" height="3" rx="1.500" fill="#fff" fill-opacity=".6"/>')
   };
   var LOGOS = '<i class="logos" aria-hidden="true"><span class="wm-h">HYUNDAI</span><span class="wm-g">GENESIS</span></i>';
+  /* ---- 홈 화면에 추가 ---- */
+  var deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; var b = $("installBox"); if (b) b.outerHTML = installCard(); });
+  window.addEventListener("appinstalled", function () { deferredPrompt = null; var b = $("installBox"); if (b) b.remove(); toast("홈 화면에 추가했습니다."); });
+  function isStandalone() { try { return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) { return false; } }
+  function installCard() {
+    if (isStandalone()) return "";
+    return '<section class="card install" id="installBox"><div><b>홈 화면에 내 차 도우미 두기</b><span>앱처럼 바로 열립니다. 설치할 것도, 가입도 없습니다.</span></div><button type="button" class="btn p" id="goInstall">홈 화면에 추가</button><div id="installHelp"></div></section>';
+  }
+  function installHelp() {
+    var ua = navigator.userAgent || "", ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
+    var inapp = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(ua);
+    if (inapp) return '<p><b>카카오톡·네이버 앱 안에서는 추가할 수 없습니다.</b> 오른쪽 위(또는 아래) 메뉴에서 <b>' + (ios ? "Safari로 열기" : "다른 브라우저로 열기(Chrome)") + "</b>를 누른 뒤 다시 시도해 주세요.</p>";
+    if (ios) return "<ol><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b>(네모에 위쪽 화살표)을 누릅니다.</li><li>목록을 내려 <b>홈 화면에 추가</b>를 누릅니다.</li><li>오른쪽 위 <b>추가</b>를 누르면 끝입니다.</li></ol>";
+    return "<ol><li>Chrome 오른쪽 위 <b>점 세 개(⋮)</b> 메뉴를 누릅니다.</li><li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b>를 누릅니다.</li><li><b>추가</b>(설치)를 누르면 끝입니다.</li></ol>";
+  }
+  if ("serviceWorker" in navigator && /^https:$/.test(location.protocol)) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
   function head(step, total, back) {
     return '<div class="stepbar"><a class="back" href="#' + back + '">‹ 뒤로</a>' + (total ? '<span class="prog num">' + step + " / " + total + "</span>" : "") + "</div>" +
       (total ? '<div class="bar" aria-hidden="true"><i style="width:' + Math.round(step / total * 100) + '%"></i></div>' : "");
@@ -443,7 +475,7 @@ body { background: var(--page); }
       '<div class="in home2"><label class="flbl" for="lampQ">계기판에 켜진 불, 이름으로 찾기</label>' +
       '<input class="search" id="lampQ" type="search" placeholder="예: 엔진, 타이어, 배터리" autocomplete="off"><div id="findr" aria-live="polite"></div>' +
       '<div class="pop" aria-label="자주 찾는 불">' + pop + "</div>" +
-      '<nav class="short" aria-label="바로가기"><a href="#crash"><i>' + ico(UI.plus) + '</i>사고가 났어요</a><a href="#stop"><i>' + ico(UI.stop) + '</i>차가 멈췄어요</a><a href="#nearby"><i>' + ico(UI.wrench) + '</i>정비소 찾기</a><a href="https://hyundaicar.kr" target="_blank" rel="noopener"><i>' + ico(UI.car) + "</i>신차 상담</a></nav></div>";
+      '<nav class="short" aria-label="바로가기"><a href="#crash"><i>' + ico(UI.plus) + '</i>사고가 났어요</a><a href="#stop"><i>' + ico(UI.stop) + '</i>차가 멈췄어요</a><a href="#nearby"><i>' + ico(UI.wrench) + '</i>정비소 찾기</a><a href="https://hyundaicar.kr" target="_blank" rel="noopener"><i>' + ico(UI.car) + "</i>신차 상담</a></nav>" + installCard() + "</div>";
   }
   function vFuelType() {
     return wrap(head(1, 3, "") + '<p class="q">내 차 연료는 무엇인가요?</p><p class="qs">연료에 따라 켜지는 불이 다릅니다.</p><div class="choices">' +
@@ -704,6 +736,10 @@ body { background: var(--page); }
     if (t.id === "goFuel") { loadFuel(); return; }
     if (t.id === "goWx") { loadWx(); return; }
     if (t.id === "goEv") { loadEv(); return; }
+    if (t.id === "goInstall") {
+      if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; }); return; }
+      var hp = $("installHelp"); if (hp) hp.innerHTML = installHelp(); return;
+    }
     if ((x = t.closest("[data-evf]"))) { near.evFast = x.getAttribute("data-evf") === "1"; redrawNear(); loadEvStat(); return; }
     if ((x = t.closest("[data-prod]"))) { near.prod = x.getAttribute("data-prod"); try { localStorage.setItem("carhelp_prod", near.prod); } catch (err) {} if (near.fuel) loadFuel(); else redrawNear(); return; }
     if (t.id === "copyLamp") { copy(lampText(t.getAttribute("data-id")), "경고등 내용을 복사했습니다."); return; }
