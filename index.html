@@ -307,6 +307,20 @@ body { background: var(--page); }
 .install ol { list-style: decimal; padding-left: 20px; display: grid; gap: 4px; }
 @media (max-width: 420px) { .install { grid-template-columns: 1fr; } .install .btn { width: 100%; } }
 
+.tile.wide { grid-column: 1 / -1; min-height: 0; display: flex; align-items: center; gap: 16px; padding: 18px; }
+.tile.wide i { margin-bottom: 0; flex: none; }
+.tile.wide .tw { display: grid; gap: 2px; padding-right: 20px; }
+.tile.wide::after { top: 50%; margin-top: -5px; }
+.pgrp { margin-top: 18px; }
+.pgrp h2 { font-size: 15px; font-weight: 800; color: var(--link); margin-bottom: 8px; }
+.plist { display: grid; gap: 8px; }
+.prow { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 14px; background: var(--bg); box-shadow: var(--shadow); }
+.prow b { display: block; font-size: 16px; }
+.prow span { display: block; font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+.prow em { font-style: normal; font-weight: 800; font-size: 16px; color: var(--ink); text-align: right; white-space: nowrap; }
+.prow em { color: var(--link); }
+@media (max-width: 420px) { .prow { padding: 12px 14px; } .prow em { font-size: 15px; } }
+
 @media (max-width: 860px) {
   .nav { display: none; }
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -431,9 +445,21 @@ body { background: var(--page); }
     gauge: fi("a", "#ffd166", "#f59e0b", '<path d="M3 31a21 21 0 0 1 42 0v4a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" fill="GR"/><path d="M9 31a15 15 0 0 1 30 0" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/><path d="M24 31l8-10" stroke="#7c4a03" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="31" r="4.500" fill="#7c4a03"/>'),
     sos: fi("b", "#ff8a80", "#ef4444", '<path d="M24 5c1.700 0 3.200.900 4 2.400l16.400 28.400A4.600 4.600 0 0 1 40.400 43H7.600a4.600 4.600 0 0 1-4-7.200L20 7.400A4.600 4.600 0 0 1 24 5z" fill="GR"/><ellipse cx="18" cy="17" rx="5" ry="8" fill="#fff" fill-opacity=".18" transform="rotate(30 18 17)"/><rect x="21.500" y="16" width="5" height="14" rx="2.500" fill="#fff"/><circle cx="24" cy="35.500" r="2.900" fill="#fff"/>'),
     pump: fi("c", "#6ee7a8", "#16a34a", '<rect x="7" y="5" width="24" height="38" rx="5" fill="GR"/><rect x="11.500" y="10" width="15" height="11" rx="2.500" fill="#fff" fill-opacity=".9"/><path d="M31 18h3.500a4 4 0 0 1 4 4v11a3 3 0 0 0 6 0V19l-5-6" fill="none" stroke="#15803d" stroke-width="3.400" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="40" width="30" height="4" rx="2" fill="#15803d"/>'),
+    wrench: fi("e", "#c4b5fd", "#7c3aed", '<path d="M33 5a10 10 0 0 0-9.400 13.400L7.300 34.500a4.200 4.200 0 0 0 6 6l16.100-16.100A10 10 0 0 0 43 15l-6 6-6-1.600-1.600-6 6-6A10 10 0 0 0 33 5z" fill="GR"/><circle cx="10.300" cy="37.700" r="1.800" fill="#fff"/><path d="M26 10.500a6 6 0 0 1 4-2" stroke="#fff" stroke-opacity=".55" stroke-width="2.400" stroke-linecap="round" fill="none"/>'),
     car: fi("d", "#7fb3ff", "#2563eb", '<path d="M11 21l3.600-9.200A5 5 0 0 1 19.300 8.600h9.400a5 5 0 0 1 4.700 3.200L37 21z" fill="#bfdbfe"/><rect x="4" y="19" width="40" height="17" rx="6" fill="GR"/><rect x="8" y="34" width="8" height="8" rx="3" fill="#1e3a8a"/><rect x="32" y="34" width="8" height="8" rx="3" fill="#1e3a8a"/><rect x="8" y="24" width="8" height="4.500" rx="2.250" fill="#fde68a"/><rect x="32" y="24" width="8" height="4.500" rx="2.250" fill="#fde68a"/><rect x="19" y="28" width="10" height="3" rx="1.500" fill="#fff" fill-opacity=".6"/>')
   };
   var LOGOS = '<i class="logos" aria-hidden="true"><span class="wm-h">HYUNDAI</span><span class="wm-g">GENESIS</span></i>';
+  /* ---- 카카오톡·네이버 등 앱 안 브라우저면 휴대폰 기본 브라우저로 다시 열기 ---- */
+  (function () {
+    var ua = navigator.userAgent || "", url = location.href;
+    var kakao = /KAKAOTALK/i.test(ua), inapp = kakao || /NAVER\(inapp|NAVER|Line\/|Instagram|FBAN|FBAV|everytimeApp|DaumApps|band\//i.test(ua);
+    if (!inapp) return;
+    var ios = /iPhone|iPad|iPod/i.test(ua), android = /Android/i.test(ua);
+    try { if (sessionStorage.getItem("carhelp_esc")) return; sessionStorage.setItem("carhelp_esc", "1"); } catch (e) {}
+    if (kakao) { location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(url); return; }
+    if (android) { location.href = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end"; return; }
+    if (ios) window.__escNote = "앱 안 브라우저에서는 홈 화면에 추가할 수 없습니다. 오른쪽 아래(또는 위) 메뉴에서 'Safari로 열기'를 눌러 주세요.";
+  })();
   /* ---- 홈 화면에 추가 ---- */
   var deferredPrompt = null;
   window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; var b = $("installBox"); if (b) b.outerHTML = installCard(); });
@@ -441,7 +467,7 @@ body { background: var(--page); }
   function isStandalone() { try { return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) { return false; } }
   function installCard() {
     if (isStandalone()) return "";
-    return '<section class="card install" id="installBox"><div><b>홈 화면에 내 차 도우미 두기</b><span>앱처럼 바로 열립니다. 설치할 것도, 가입도 없습니다.</span></div><button type="button" class="btn p" id="goInstall">홈 화면에 추가</button><div id="installHelp"></div></section>';
+    return '<section class="card install" id="installBox">' + (window.__escNote ? '<p class="err" style="grid-column:1/-1">' + window.__escNote + "</p>" : "") + '<div><b>홈 화면에 내 차 도우미 두기</b><span>앱처럼 바로 열립니다. 설치할 것도, 가입도 없습니다.</span></div><button type="button" class="btn p" id="goInstall">홈 화면에 추가</button><div id="installHelp"></div></section>';
   }
   function installHelp() {
     var ua = navigator.userAgent || "", ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
@@ -467,15 +493,17 @@ body { background: var(--page); }
   function vHome() {
     var pop = ["engine", "tpms", "oil", "coolant", "battery"].map(function (id) { return '<a href="#lamp-' + id + '">' + esc(lampOf(id).name) + "</a>"; }).join("");
     return '<section class="hero"><div class="in"><h1>내 차 도우미</h1>' +
-      '<p class="lede">상황을 누르면 한 단계씩 안내합니다.</p><div class="tiles">' +
-      '<a class="tile" href="#fueltype"><i>' + TI.gauge + '</i><b>경고등 뜻</b><small>색과 모양으로 찾기 · <span class="num">' + LAMPS.length + "</span>가지</small></a>" +
+      '<div class="tiles">' +
+      '<a class="tile" href="https://hyundaicar.kr" target="_blank" rel="noopener">' + LOGOS + "<b>신차 상담<br>중고차 정리</b><small>hyundaicar.kr에서 상담하기</small></a>" +
       '<a class="tile" href="#sos"><i>' + TI.sos + "</i><b>사고·긴급</b><small>할 일 순서 · 119 · 112</small></a>" +
       '<a class="tile" href="#nearby"><i>' + TI.pump + "</i><b>주유·충전·세차</b><small>주변 최저가 · 충전소 · 세차 날씨</small></a>" +
-      '<a class="tile" href="https://hyundaicar.kr" target="_blank" rel="noopener">' + LOGOS + "<b>신차 상담 · 중고차 정리</b><small>hyundaicar.kr에서 상담하기</small></a></div></div></section>" +
+      '<a class="tile" href="#fueltype"><i>' + TI.gauge + '</i><b>경고등 뜻</b><small>색과 모양으로 찾기 · <span class="num">' + LAMPS.length + "</span>가지</small></a>" +
+      '<a class="tile wide" href="#parts"><i>' + TI.wrench + "</i><span class=\"tw\"><b>소모품 교환 주기</b><small>엔진오일·필터·타이어 등 부품별 교환 시기</small></span></a>" +
+      "</div></div></section>" +
       '<div class="in home2"><label class="flbl" for="lampQ">계기판에 켜진 불, 이름으로 찾기</label>' +
       '<input class="search" id="lampQ" type="search" placeholder="예: 엔진, 타이어, 배터리" autocomplete="off"><div id="findr" aria-live="polite"></div>' +
       '<div class="pop" aria-label="자주 찾는 불">' + pop + "</div>" +
-      '<nav class="short" aria-label="바로가기"><a href="#crash"><i>' + ico(UI.plus) + '</i>사고가 났어요</a><a href="#stop"><i>' + ico(UI.stop) + '</i>차가 멈췄어요</a><a href="#nearby"><i>' + ico(UI.wrench) + '</i>정비소 찾기</a><a href="https://hyundaicar.kr" target="_blank" rel="noopener"><i>' + ico(UI.car) + "</i>신차 상담</a></nav>" + installCard() + "</div>";
+      '<nav class="short" aria-label="바로가기"><a href="#crash"><i>' + ico(UI.plus) + '</i>사고가 났어요</a><a href="#stop"><i>' + ico(UI.stop) + '</i>차가 멈췄어요</a><a href="#parts"><i>' + ico(UI.wrench) + '</i>정비 주기</a><a href="https://hyundaicar.kr" target="_blank" rel="noopener"><i>' + ico(UI.car) + "</i>신차 상담</a></nav>" + installCard() + "</div>";
   }
   function vFuelType() {
     return wrap(head(1, 3, "") + '<p class="q">내 차 연료는 무엇인가요?</p><p class="qs">연료에 따라 켜지는 불이 다릅니다.</p><div class="choices">' +
@@ -652,8 +680,24 @@ body { background: var(--page); }
     return wrap(head(0, 0, "") + '<h1 class="pg">주유·충전·세차</h1><p class="qs">무엇을 찾으세요? 내 위치 근처를 이 화면에서 바로 보여 드립니다.</p><div class="choices">' +
       choice('href="#gas"', "pump", "주유소 최저가", "반경 5km · 싼 순서") +
       choice('href="#charge"', "bolt", "전기차 충전소", "가까운 순서 · 지금 빈 충전기") +
-      choice('href="#wash"', "sun", "세차하기 좋은 날", "오늘부터 4일 날씨") + "</div>" +
-      '<h2 class="sub">지도에서 찾기</h2><div class="links"><a class="lk" href="' + NMAP + encodeURIComponent("블루핸즈") + '" target="_blank" rel="noopener"><b>블루핸즈 정비</b><span>현대자동차 공식 서비스 협력점</span><em>지도에서 찾기 →</em></a></div>');
+      choice('href="#wash"', "sun", "세차하기 좋은 날", "오늘부터 4일 날씨") + "</div>");
+  }
+  /* ---- 소모품 교환 주기 (자동차365 정비 주기 안내 기준) ---- */
+  var PARTS = [
+    ["5,000~10,000km마다", "자주 갈아요", [["엔진오일 · 오일필터", "5,000~10,000km", "주행 습관과 차종에 따라 다릅니다. 짧은 거리를 자주 다니면 앞쪽 주기로."], ["공기 · 에어컨 필터", "10,000km", "에어컨 냄새가 나거나 바람이 약하면 더 일찍."], ["타이어 위치 교환", "10,000km", "앞뒤를 바꿔 고르게 닳게 합니다."]]],
+    ["20,000km마다", "", [["연료필터", "20,000km", ""], ["휠 얼라이먼트", "20,000km마다 조정", "핸들이 한쪽으로 쏠리면 바로 점검."]]],
+    ["40,000km마다", "", [["변속기 오일", "40,000km", ""], ["브레이크 오일", "40,000km", ""], ["점화플러그", "40,000km", ""], ["하이텐션 코드", "40,000km", ""], ["구동벨트", "40,000km", ""], ["브레이크 패드 · 디스크", "40,000km", "끽 소리가 나면 주행거리와 상관없이 점검."], ["냉각수 · 부동액", "40,000km", ""]]],
+    ["기간 · 상태를 보고", "", [["배터리", "2~3년", "시동이 약하게 걸리면 미리 점검."], ["타이어", "마모 상태 보고 교환", "홈 깊이가 1.6mm 이하면 교체 대상입니다."]]]
+  ];
+  function vParts() {
+    return wrap(head(0, 0, "") + '<h1 class="pg">소모품 교환 주기</h1><p class="qs">부품별로 언제 갈아야 하는지 한눈에 봅니다. 차종과 모델마다 다를 수 있으니 차량 취급설명서를 먼저 확인하세요.</p>' +
+      PARTS.map(function (g) {
+        return '<section class="pgrp"><h2>' + g[0] + "</h2>" + '<div class="plist">' + g[2].map(function (r) {
+          return '<div class="prow"><div><b>' + r[0] + "</b>" + (r[2] ? "<span>" + r[2] + "</span>" : "") + '</div><em class="num">' + r[1] + "</em></div>";
+        }).join("") + "</div></section>";
+      }).join("") +
+      '<p class="note">출처: 자동차365 자동차 정비 주기 안내(국토교통부·한국교통안전공단). 상세 주기는 제조사·모델에 따라 다릅니다.</p>' +
+      '<h2 class="sub">정비소 찾기</h2><div class="links"><a class="lk" href="' + NMAP + encodeURIComponent("블루핸즈") + '" target="_blank" rel="noopener"><b>블루핸즈 정비</b><span>현대자동차 공식 서비스 협력점</span><em>지도에서 찾기 →</em></a></div>');
   }
   function vGas() { return wrap(head(0, 0, "nearby") + '<div id="nearFuel">' + fuelBox() + "</div>"); }
   function vCharge() { return wrap(head(0, 0, "nearby") + '<div id="nearEv">' + evBox() + "</div>"); }
@@ -704,7 +748,7 @@ body { background: var(--page); }
     catch (e) { toast("복사가 안 되는 화면입니다. 직접 선택해 복사해 주세요."); }
   }
 
-  var ROUTES = { fueltype: vFuelType, color: vColor, shape: vShape, sos: vSos, crash: vCrash, "crash-steps": vCrashSteps, stop: vStop, "stop-steps": vStopSteps, nearby: vNearby, gas: vGas, charge: vCharge, wash: vWash };
+  var ROUTES = { fueltype: vFuelType, color: vColor, shape: vShape, sos: vSos, crash: vCrash, "crash-steps": vCrashSteps, stop: vStop, "stop-steps": vStopSteps, nearby: vNearby, gas: vGas, charge: vCharge, wash: vWash, parts: vParts };
   function route() { return (location.hash || "").slice(1); }
   function render() {
     var r = route(), home = false, h;
