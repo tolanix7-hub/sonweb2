@@ -327,6 +327,23 @@ body { background: var(--page); }
 .tile.wide i.logos { height: auto; gap: 4px; min-width: 96px; }
 @media (min-width: 861px) { .tiles { grid-template-rows: 1fr auto; } }
 
+.tile small.one { white-space: nowrap; }
+.desk .box { display: grid; gap: 16px; }
+.dacts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dacts .btn { width: 100%; }
+.btn.telg { background: #16a34a; border-color: #16a34a; color: #fff; box-shadow: none; }
+
+/* HYUNDAI·GENESIS 글자 폭 맞추기: GENESIS를 HYUNDAI 폭에 맞춰 양쪽 정렬 */
+.tile.wide i.logos { display: inline-grid; justify-items: stretch; width: max-content; min-width: 0; }
+.wm-h { margin-right: -.14em; }
+.tile i.logos .wm-g { display: flex; justify-content: space-between; letter-spacing: 0; padding-left: 0; }
+.tile i.logos .wm-g span { display: inline; }
+
+.skel { display: grid; gap: 8px; }
+.skel i { display: block; height: 58px; border-radius: 12px; background: linear-gradient(90deg, var(--page) 0%, #e9edf3 50%, var(--page) 100%); background-size: 200% 100%; animation: sk 1.2s linear infinite; }
+@keyframes sk { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skel i { animation: none; } }
+
 @media (max-width: 860px) {
   .nav { display: none; }
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -349,7 +366,7 @@ body { background: var(--page); }
 
 <section class="desk" id="desk"><div class="in"><div class="box">
   <div><h2>차량 상담이 필요하시면</h2><p>현대자동차·제네시스 신차 상담과 견적은 금오대리점 손연기 카마스터가 직접 안내합니다. 전화 010-3884-3927</p></div>
-  <div class="acts" style="margin-top:0"><a class="btn k" href="https://open.kakao.com/o/sj86Stlc" target="_blank" rel="noopener">카카오톡 상담</a><a class="btn o" href="tel:01038843927">전화 010-3884-3927</a></div>
+  <div class="dacts"><a class="btn k" href="https://open.kakao.com/o/sj86Stlc" target="_blank" rel="noopener">카카오톡 상담</a><a class="btn telg" href="tel:01038843927">전화하기</a></div>
 </div></div></section>
 <div class="in"><p class="foot">이 페이지는 카마스터가 운영하는 개인 안내 페이지이며 현대자동차·제네시스의 공식 홈페이지가 아닙니다. 경고등 설명은 일반 안내이고, 전화번호는 바뀔 수 있습니다.</p></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -454,7 +471,7 @@ body { background: var(--page); }
     wrench: fi("e", "#c4b5fd", "#7c3aed", '<path d="M33 5a10 10 0 0 0-9.400 13.400L7.300 34.500a4.200 4.200 0 0 0 6 6l16.100-16.100A10 10 0 0 0 43 15l-6 6-6-1.600-1.600-6 6-6A10 10 0 0 0 33 5z" fill="GR"/><circle cx="10.300" cy="37.700" r="1.800" fill="#fff"/><path d="M26 10.500a6 6 0 0 1 4-2" stroke="#fff" stroke-opacity=".55" stroke-width="2.400" stroke-linecap="round" fill="none"/>'),
     car: fi("d", "#7fb3ff", "#2563eb", '<path d="M11 21l3.600-9.200A5 5 0 0 1 19.300 8.600h9.400a5 5 0 0 1 4.700 3.200L37 21z" fill="#bfdbfe"/><rect x="4" y="19" width="40" height="17" rx="6" fill="GR"/><rect x="8" y="34" width="8" height="8" rx="3" fill="#1e3a8a"/><rect x="32" y="34" width="8" height="8" rx="3" fill="#1e3a8a"/><rect x="8" y="24" width="8" height="4.500" rx="2.250" fill="#fde68a"/><rect x="32" y="24" width="8" height="4.500" rx="2.250" fill="#fde68a"/><rect x="19" y="28" width="10" height="3" rx="1.500" fill="#fff" fill-opacity=".6"/>')
   };
-  var LOGOS = '<i class="logos" aria-hidden="true"><span class="wm-h">HYUNDAI</span><span class="wm-g">GENESIS</span></i>';
+  var LOGOS = '<i class="logos" aria-hidden="true"><span class="wm-h">HYUNDAI</span><span class="wm-g"><span>G</span><span>E</span><span>N</span><span>E</span><span>S</span><span>I</span><span>S</span></span></i>';
   /* ---- 카카오톡·네이버 등 앱 안 브라우저면 휴대폰 기본 브라우저로 다시 열기 ---- */
   (function () {
     var ua = navigator.userAgent || "", url = location.href;
@@ -496,16 +513,16 @@ body { background: var(--page); }
     var pop = ["engine", "tpms", "oil", "coolant", "battery"].map(function (id) { return '<a href="#lamp-' + id + '">' + esc(lampOf(id).name) + "</a>"; }).join("");
     return '<section class="hero"><div class="in"><h1>내 차 도우미</h1>' +
       '<div class="tiles">' +
-      '<a class="tile" href="#parts"><i>' + TI.wrench + "</i><b>소모품 교환 주기</b><small>엔진오일·필터·타이어 등</small></a>" +
+      '<a class="tile" href="#parts"><i>' + TI.wrench + "</i><b>소모품 교환 주기</b><small class=\"one\">엔진오일·필터·타이어</small></a>" +
       '<a class="tile" href="#sos"><i>' + TI.sos + "</i><b>사고·긴급</b><small>할 일 순서 · 119 · 112</small></a>" +
       '<a class="tile" href="#nearby"><i>' + TI.pump + "</i><b>주유·충전·세차</b><small>주변 최저가 · 충전소 · 세차 날씨</small></a>" +
       '<a class="tile" href="#fueltype"><i>' + TI.gauge + '</i><b>경고등 뜻</b><small>색과 모양으로 찾기 · <span class="num">' + LAMPS.length + "</span>가지</small></a>" +
-      '<a class="tile wide" href="https://hyundaicar.kr" target="_blank" rel="noopener">' + LOGOS + "<span class=\"tw\"><b>신차 상담 · 중고차 정리</b><small>hyundaicar.kr에서 상담하기</small></span></a>" +
+      '<a class="tile wide" href="https://hyundaicar.kr" target="_blank" rel="noopener">' + LOGOS + "<span class=\"tw\"><b>신차 상담<br>중고차 정리</b><small>hyundaicar.kr에서 상담하기</small></span></a>" +
       "</div></div></section>" +
       '<div class="in home2"><label class="flbl" for="lampQ">계기판에 켜진 불, 이름으로 찾기</label>' +
       '<input class="search" id="lampQ" type="search" placeholder="예: 엔진, 타이어, 배터리" autocomplete="off"><div id="findr" aria-live="polite"></div>' +
       '<div class="pop" aria-label="자주 찾는 불">' + pop + "</div>" +
-      '<nav class="short" aria-label="바로가기"><a href="#crash"><i>' + ico(UI.plus) + '</i>사고가 났어요</a><a href="#stop"><i>' + ico(UI.stop) + '</i>차가 멈췄어요</a><a href="#parts"><i>' + ico(UI.wrench) + '</i>정비 주기</a><a href="https://hyundaicar.kr" target="_blank" rel="noopener"><i>' + ico(UI.car) + "</i>신차 상담</a></nav>" + installCard() + "</div>";
+      installCard() + "</div>";
   }
   function vFuelType() {
     return wrap(head(1, 3, "") + '<p class="q">내 차 연료는 무엇인가요?</p><p class="qs">연료에 따라 켜지는 불이 다릅니다.</p><div class="choices">' +
@@ -572,19 +589,31 @@ body { background: var(--page); }
   function won(n) { return Number(n).toLocaleString("ko-KR"); }
   function km(m) { return m < 1000 ? m + "m" : (m / 1000).toFixed(1) + "km"; }
   var NMAP = "https://map.naver.com/p/search/";
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  var locWait = null;
   function getLoc() {
-    return new Promise(function (ok, no) {
-      if (near.loc && Date.now() - near.loc.t < 10 * 60000) return ok(near.loc);
+    if (!near.loc) { var s = lsGet("carhelp_loc"); if (s && s.lat) near.loc = s; }
+    if (near.loc && Date.now() - near.loc.t < 10 * 60000) return Promise.resolve(near.loc);
+    if (locWait) return locWait;
+    locWait = new Promise(function (ok, no) {
       if (!navigator.geolocation) return no("이 기기에서는 위치를 쓸 수 없습니다.");
       navigator.geolocation.getCurrentPosition(function (p) {
-        near.loc = { lat: Math.round(p.coords.latitude * 1000) / 1000, lon: Math.round(p.coords.longitude * 1000) / 1000, t: Date.now() }; ok(near.loc);
-      }, function (e) { no(e && e.code === 1 ? "위치 사용을 허용하지 않으셨습니다. 브라우저 설정에서 허용한 뒤 다시 눌러 주세요." : "위치를 가져오지 못했습니다. 잠시 뒤 다시 눌러 주세요."); }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
+        near.loc = { lat: Math.round(p.coords.latitude * 1000) / 1000, lon: Math.round(p.coords.longitude * 1000) / 1000, t: Date.now() }; lsSet("carhelp_loc", near.loc); ok(near.loc);
+      }, function (e) { no(e && e.code === 1 ? "위치 사용을 허용하지 않으셨습니다. 브라우저 설정에서 허용한 뒤 다시 눌러 주세요." : "위치를 가져오지 못했습니다. 잠시 뒤 다시 눌러 주세요."); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 10 * 60000 });
     });
+    locWait.then(function () { locWait = null; }, function () { locWait = null; });
+    return locWait;
   }
+  /* 메뉴를 여는 순간 위치를 미리 잡아 둡니다(이미 허용한 경우만) */
+  function warmLoc() {
+    try { if (navigator.permissions) navigator.permissions.query({ name: "geolocation" }).then(function (s) { if (s.state === "granted") getLoc().catch(function () {}); }).catch(function () {}); } catch (e) {}
+  }
+  function ago(t) { var m = Math.round((Date.now() - t) / 60000); return m < 1 ? "방금" : m < 60 ? m + "분 전" : Math.round(m / 60) + "시간 전"; }
   function fuelBox() {
     var chips = '<div class="pchips" role="group" aria-label="연료 종류">' + PRODS.map(function (p) { return '<button type="button" class="pchip" data-prod="' + p[0] + '" aria-pressed="' + (near.prod === p[0]) + '">' + p[1] + "</button>"; }).join("") + "</div>";
     var body;
-    if (near.busy === "fuel") body = '<p class="wait">가까운 주유소 가격을 찾고 있습니다…</p>';
+    if (near.busy === "fuel") body = '<div class="skel"><i></i><i></i><i></i></div><p class="wait">' + (near.loc && Date.now() - near.loc.t < 10 * 60000 ? "가까운 주유소 가격을 받고 있습니다…" : "현재 위치를 확인하고 있습니다…") + "</p>";
     else if (near.fuelErr) body = '<p class="err">' + esc(near.fuelErr) + '</p><div class="row2"><button type="button" class="btn p" id="goFuel">다시 시도</button><a class="btn" href="https://www.opinet.co.kr" target="_blank" rel="noopener">오피넷에서 보기</a></div>';
     else if (near.fuel && near.fuel.prod === near.prod) {
       var it = near.fuel.items || [];
@@ -593,7 +622,7 @@ body { background: var(--page); }
         var min = it[0].price, max = Math.max.apply(null, it.map(function (o) { return o.price; }));
         body = '<p class="qs">반경 5km · 싼 순서입니다.' + (max > min ? " 가장 싼 곳과 비싼 곳은 리터당 <b>" + won(max - min) + "원</b>, 50L면 <b>" + won((max - min) * 50) + "원</b> 차이입니다." : "") + "</p>" +
           '<div class="stations">' + it.map(function (o, i) { return '<a class="station' + (i === 0 ? " top" : "") + '" href="' + NMAP + encodeURIComponent(o.name) + '" target="_blank" rel="noopener"><b>' + (i + 1) + ". " + esc(o.name) + '</b><span class="pr num">' + won(o.price) + "원</span><span>" + esc(o.brand) + (o.brand ? " · " : "") + km(o.dist) + '</span><span class="gk">길찾기 ›</span></a>'; }).join("") + "</div>" +
-          '<p class="note">가격: 오피넷(한국석유공사) · 거리는 직선거리 · 10분마다 새로 받습니다.</p>';
+          '<p class="note">' + (near.refresh === "fuel" ? "최신 가격 확인 중… · " + (near.fuelAt ? ago(near.fuelAt) + " 목록 · " : "") : "") + "가격: 오피넷(한국석유공사) · 거리는 직선거리 · 10분마다 새로 받습니다.</p>";
       }
     } else body = '<button type="button" class="btn p wide" id="goFuel">내 위치로 최저가 보기</button><p class="note">누르면 위치 사용을 묻습니다. 위치는 가격을 찾는 데만 씁니다.</p>';
     return '<section class="card nb"><h2>주유소 최저가</h2>' + chips + body + "</section>";
@@ -706,25 +735,39 @@ body { background: var(--page); }
   function vWash() { return wrap(head(0, 0, "nearby") + '<div id="nearWx">' + wxBox() + "</div>"); }
   function redrawNear() { var f = $("nearFuel"), v = $("nearEv"), w = $("nearWx"); if (f) f.innerHTML = fuelBox(); if (v) v.innerHTML = evBox(); if (w) w.innerHTML = wxBox(); }
   function loadFuel() {
-    near.busy = "fuel"; near.fuelErr = ""; redrawNear();
+    near.fuelErr = "";
+    var c = lsGet("carhelp_fuel");
+    if (!(near.fuel && near.fuel.prod === near.prod) && c && c.d && c.d.prod === near.prod && Date.now() - c.t < 6 * 3600e3) { near.fuel = c.d; near.fuelAt = c.t; }
+    var shown = near.fuel && near.fuel.prod === near.prod;
+    if (shown) near.refresh = "fuel"; else near.busy = "fuel";
+    redrawNear();
     getLoc().then(function (loc) {
       return fetch("api/fuel?lat=" + loc.lat + "&lon=" + loc.lon + "&prod=" + near.prod).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok || !d.items) throw new Error(d.error || "가격을 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요."); return d; });
       });
-    }).then(function (d) { near.fuel = d; }, function (e) { near.fuelErr = typeof e === "string" ? e : (e && e.message) || "가격을 불러오지 못했습니다."; })
-      .then(function () { near.busy = ""; redrawNear(); });
+    }).then(function (d) { near.fuel = d; near.fuelAt = 0; lsSet("carhelp_fuel", { t: Date.now(), d: d }); },
+      function (e) { var m = typeof e === "string" ? e : (e && e.message) || "가격을 불러오지 못했습니다."; if (shown) toast("최신 가격을 받지 못해 지난 목록을 보여 드립니다."); else near.fuelErr = m; })
+      .then(function () { near.busy = ""; near.refresh = ""; redrawNear(); });
   }
   function loadWx() {
-    near.busy = "wx"; near.wxErr = ""; redrawNear();
+    near.wxErr = "";
+    var c = lsGet("carhelp_wx");
+    if (!near.wx && c && c.d && Date.now() - c.t < 3 * 3600e3) near.wx = c.d;
+    var shown = !!near.wx;
+    if (shown && c && Date.now() - c.t < 30 * 60000) { redrawNear(); return; }
+    if (shown) near.refresh = "wx"; else near.busy = "wx";
+    redrawNear();
     getLoc().then(function (loc) {
       var q = "latitude=" + loc.lat + "&longitude=" + loc.lon + "&timezone=Asia%2FSeoul&forecast_days=4&daily=weather_code,precipitation_probability_max,precipitation_sum,temperature_2m_min,temperature_2m_max";
       return fetch("https://api.open-meteo.com/v1/forecast?" + q).then(function (r) { if (!r.ok) throw new Error("날씨를 불러오지 못했습니다."); return r.json(); });
     }).then(function (w) {
       var D = w.daily;
       near.wx = D.time.map(function (t, i) { return { date: t, code: D.weather_code[i], pop: D.precipitation_probability_max[i] || 0, sum: D.precipitation_sum[i] || 0, tmin: D.temperature_2m_min[i], tmax: D.temperature_2m_max[i] }; });
-    }, function (e) { near.wxErr = typeof e === "string" ? e : "날씨를 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요."; })
-      .then(function () { near.busy = ""; redrawNear(); });
+      lsSet("carhelp_wx", { t: Date.now(), d: near.wx });
+    }, function (e) { if (!shown) near.wxErr = typeof e === "string" ? e : "날씨를 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요."; })
+      .then(function () { near.busy = ""; near.refresh = ""; redrawNear(); });
   }
+
   function dday(d) { if (!d) return null; var t = new Date(); t.setHours(0, 0, 0, 0); var x = new Date(d + "T00:00:00"); return isNaN(x) ? null : Math.round((x - t) / 864e5); }
   function sumHtml() {
     var ins = insOf(), d = dday(car.insp), empty = !car.plate && !car.model && !ins && !car.insp;
@@ -761,9 +804,10 @@ body { background: var(--page); }
     else { h = vHome(); home = true; }
     if (h.indexOf('<section class="hero"') === 0) home = true;
     $("app").innerHTML = h;
-    if (r === "gas" && !near.busy && !(near.fuel && near.fuel.prod === near.prod) && !near.fuelErr) loadFuel();
+    if (r === "gas" && !near.busy && !near.refresh && !near.fuelErr && !(near.fuel && near.fuel.prod === near.prod && !near.fuelAt && near.fuelT && Date.now() - near.fuelT < 10 * 60000)) { loadFuel(); near.fuelT = Date.now(); }
+    if (r === "nearby") warmLoc();
     if (r === "charge" && !near.busy && !near.ev && !near.evErr) loadEv();
-    if (r === "wash" && !near.busy && !near.wx && !near.wxErr) loadWx();
+    if (r === "wash" && !near.busy && !near.refresh && !near.wxErr) loadWx();
     $("desk").hidden = !home;
     var as = document.querySelectorAll(".nav a");
     for (var i = 0; i < as.length; i++) as[i].setAttribute("aria-current", String(as[i].getAttribute("data-m") === (r.indexOf("lamp-") === 0 || r === "color" || r === "shape" ? "fueltype" : r.replace(/-steps$/, "").replace(/^(crash|stop)$/, "sos").replace(/^(gas|charge|wash)$/, "nearby"))));
