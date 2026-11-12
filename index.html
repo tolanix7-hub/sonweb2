@@ -405,6 +405,9 @@ body { background: var(--page); }
     city: '<path d="M4 20V8h6v12M10 20V4h8v16M3 20h18M13 8h2M13 12h2M13 16h2"/>',
     plus: '<rect x="3.500" y="3.500" width="17" height="17" rx="3"/><path d="M12 8v8M8 12h8"/>',
     check: '<circle cx="12" cy="12" r="8.500"/><path d="m8.500 12.500 2.500 2.500 4.500-5"/>',
+    pump: '<rect x="4" y="3.500" width="10" height="17" rx="1.500"/><path d="M4 9h10M14 7h2l3 3v7.500a1.500 1.500 0 0 1-3 0V12h-2"/>',
+    bolt: '<path d="M13 2.500 5 13.500h6L10 21.500l8-11h-6Z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.500v2M12 19.500v2M2.500 12h2M19.500 12h2M5.300 5.300l1.400 1.400M17.300 17.300l1.400 1.400M5.300 18.700l1.400-1.400M17.300 6.700l1.400-1.400"/>',
     wrench: '<path d="M14.500 5.500a4 4 0 0 0 4.900 4.900l-9 9a2.100 2.100 0 0 1-3-3l9-9"/>'
   };
   /* 첫 화면 타일용 면 아이콘 (색을 채운 입체 느낌) */
@@ -520,7 +523,7 @@ body { background: var(--page); }
     var chips = '<div class="pchips" role="group" aria-label="연료 종류">' + PRODS.map(function (p) { return '<button type="button" class="pchip" data-prod="' + p[0] + '" aria-pressed="' + (near.prod === p[0]) + '">' + p[1] + "</button>"; }).join("") + "</div>";
     var body;
     if (near.busy === "fuel") body = '<p class="wait">가까운 주유소 가격을 찾고 있습니다…</p>';
-    else if (near.fuelErr) body = '<p class="err">' + esc(near.fuelErr) + '</p><a class="btn" href="https://www.opinet.co.kr" target="_blank" rel="noopener">오피넷에서 직접 보기</a>';
+    else if (near.fuelErr) body = '<p class="err">' + esc(near.fuelErr) + '</p><div class="row2"><button type="button" class="btn p" id="goFuel">다시 시도</button><a class="btn" href="https://www.opinet.co.kr" target="_blank" rel="noopener">오피넷에서 보기</a></div>';
     else if (near.fuel && near.fuel.prod === near.prod) {
       var it = near.fuel.items || [];
       if (!it.length) body = '<p class="qs">반경 5km 안에 ' + esc(near.fuel.prodName) + " 파는 곳이 없습니다.</p>";
@@ -548,7 +551,7 @@ body { background: var(--page); }
   function wxBox() {
     var body;
     if (near.busy === "wx") body = '<p class="wait">날씨를 불러오고 있습니다…</p>';
-    else if (near.wxErr) body = '<p class="err">' + esc(near.wxErr) + "</p>";
+    else if (near.wxErr) body = '<p class="err">' + esc(near.wxErr) + '</p><button type="button" class="btn p wide" id="goWx">다시 시도</button>';
     else if (near.wx) {
       var v = washVerdict(near.wx);
       body = '<div class="verdict v-' + v[0] + '"><b>' + v[1] + "</b><span>" + v[2] + '</span></div><div class="days">' + near.wx.map(function (d, i) {
@@ -564,13 +567,13 @@ body { background: var(--page); }
   near.ev = null; near.evErr = ""; near.evFast = false; near.evAt = ""; near.evStat = {};
   var evCells = {};
   function evCell(k) { return evCells[k] || (evCells[k] = fetch("ev/" + k + ".json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { delete evCells[k]; return []; })); }
+  function evReady() { return fetch("ev/_info.json").then(function (r) { if (!r.ok) throw "충전소 목록이 아직 준비되지 않았습니다. 하루 한 번 자동으로 받아 오니 잠시 뒤 다시 확인해 주세요."; return r.json(); }).then(function (j) { near.evAt = j.at || ""; }); }
   function dist(a, b, c, d) { var r = Math.PI / 180, x = (d - b) * r * Math.cos((a + c) / 2 * r), y = (c - a) * r; return Math.round(Math.sqrt(x * x + y * y) * 6371000); }
   function evNear(loc) {
     var la = loc.lat * 10, lo = loc.lon * 10, A = [Math.floor(la)], B = [Math.floor(lo)];
     if (la % 1 < .5) A.push(A[0] - 1); else A.push(A[0] + 1);
     if (lo % 1 < .5) B.push(B[0] - 1); else B.push(B[0] + 1);
     var keys = []; A.forEach(function (a) { B.forEach(function (b) { keys.push(a + "_" + b); }); });
-    if (!near.evAt) fetch("ev/_info.json").then(function (r) { return r.json(); }).then(function (j) { near.evAt = j.at || ""; }).catch(function () {});
     return Promise.all(keys.map(evCell)).then(function (lists) {
       var all = [].concat.apply([], lists);
       return all.map(function (s) { return Object.assign({}, s, { d: dist(loc.lat, loc.lon, s.la, s.lo) }); }).filter(function (s) { return s.d <= 5000; }).sort(function (a, b) { return a.d - b.d; });
@@ -580,7 +583,7 @@ body { background: var(--page); }
     var chips = '<div class="pchips" role="group" aria-label="충전기 고르기"><button type="button" class="pchip" data-evf="0" aria-pressed="' + !near.evFast + '">전체</button><button type="button" class="pchip" data-evf="1" aria-pressed="' + near.evFast + '">급속만</button></div>';
     var body;
     if (near.busy === "ev") body = '<p class="wait">가까운 충전소를 찾고 있습니다…</p>';
-    else if (near.evErr) body = '<p class="err">' + esc(near.evErr) + "</p>";
+    else if (near.evErr) body = '<p class="err">' + esc(near.evErr) + '</p><button type="button" class="btn p wide" id="goEv">다시 시도</button>';
     else if (near.ev) {
       var it = near.ev.filter(function (s) { return !near.evFast || s.f > 0; }).slice(0, 10);
       if (!it.length) body = '<p class="qs">반경 5km 안에 ' + (near.evFast ? "급속 " : "") + "충전소가 없습니다.</p>";
@@ -611,15 +614,18 @@ body { background: var(--page); }
   }
   function loadEv() {
     near.busy = "ev"; near.evErr = ""; redrawNear();
-    getLoc().then(evNear).then(function (list) { near.ev = list; near.busy = ""; redrawNear(); loadEvStat(); }, function (e) { near.evErr = typeof e === "string" ? e : "충전소 목록을 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요."; near.busy = ""; redrawNear(); });
+    evReady().then(getLoc).then(evNear).then(function (list) { near.ev = list; near.busy = ""; redrawNear(); loadEvStat(); }, function (e) { near.evErr = typeof e === "string" ? e : "충전소 목록을 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요."; near.busy = ""; redrawNear(); });
   }
   function vNearby() {
-    var lk = function (url, t, s, e) { return '<a class="lk" href="' + url + '" target="_blank" rel="noopener"><b>' + t + "</b><span>" + s + "</span><em>" + e + " →</em></a>"; };
-    return wrap(head(0, 0, "") + '<h1 class="pg">주유·충전·세차</h1><p class="qs">내 위치 근처를 이 화면에서 바로 보여 드립니다.</p>' +
-      '<div id="nearFuel">' + fuelBox() + '</div><div id="nearEv">' + evBox() + '</div><div id="nearWx">' + wxBox() + "</div>" +
-      '<h2 class="sub">지도에서 찾기</h2><div class="links">' +
-      lk(NMAP + encodeURIComponent("블루핸즈"), "블루핸즈 정비", "현대자동차 공식 서비스 협력점", "지도에서 찾기") + "</div>");
+    return wrap(head(0, 0, "") + '<h1 class="pg">주유·충전·세차</h1><p class="qs">무엇을 찾으세요? 내 위치 근처를 이 화면에서 바로 보여 드립니다.</p><div class="choices">' +
+      choice('href="#gas"', "pump", "주유소 최저가", "반경 5km · 싼 순서") +
+      choice('href="#charge"', "bolt", "전기차 충전소", "가까운 순서 · 지금 빈 충전기") +
+      choice('href="#wash"', "sun", "세차하기 좋은 날", "오늘부터 4일 날씨") + "</div>" +
+      '<h2 class="sub">지도에서 찾기</h2><div class="links"><a class="lk" href="' + NMAP + encodeURIComponent("블루핸즈") + '" target="_blank" rel="noopener"><b>블루핸즈 정비</b><span>현대자동차 공식 서비스 협력점</span><em>지도에서 찾기 →</em></a></div>');
   }
+  function vGas() { return wrap(head(0, 0, "nearby") + '<div id="nearFuel">' + fuelBox() + "</div>"); }
+  function vCharge() { return wrap(head(0, 0, "nearby") + '<div id="nearEv">' + evBox() + "</div>"); }
+  function vWash() { return wrap(head(0, 0, "nearby") + '<div id="nearWx">' + wxBox() + "</div>"); }
   function redrawNear() { var f = $("nearFuel"), v = $("nearEv"), w = $("nearWx"); if (f) f.innerHTML = fuelBox(); if (v) v.innerHTML = evBox(); if (w) w.innerHTML = wxBox(); }
   function loadFuel() {
     near.busy = "fuel"; near.fuelErr = ""; redrawNear();
@@ -666,7 +672,7 @@ body { background: var(--page); }
     catch (e) { toast("복사가 안 되는 화면입니다. 직접 선택해 복사해 주세요."); }
   }
 
-  var ROUTES = { fueltype: vFuelType, color: vColor, shape: vShape, sos: vSos, crash: vCrash, "crash-steps": vCrashSteps, stop: vStop, "stop-steps": vStopSteps, nearby: vNearby };
+  var ROUTES = { fueltype: vFuelType, color: vColor, shape: vShape, sos: vSos, crash: vCrash, "crash-steps": vCrashSteps, stop: vStop, "stop-steps": vStopSteps, nearby: vNearby, gas: vGas, charge: vCharge, wash: vWash };
   function route() { return (location.hash || "").slice(1); }
   function render() {
     var r = route(), home = false, h;
@@ -677,9 +683,12 @@ body { background: var(--page); }
     else { h = vHome(); home = true; }
     if (h.indexOf('<section class="hero"') === 0) home = true;
     $("app").innerHTML = h;
+    if (r === "gas" && !near.busy && !(near.fuel && near.fuel.prod === near.prod) && !near.fuelErr) loadFuel();
+    if (r === "charge" && !near.busy && !near.ev && !near.evErr) loadEv();
+    if (r === "wash" && !near.busy && !near.wx && !near.wxErr) loadWx();
     $("desk").hidden = !home;
     var as = document.querySelectorAll(".nav a");
-    for (var i = 0; i < as.length; i++) as[i].setAttribute("aria-current", String(as[i].getAttribute("data-m") === (r.indexOf("lamp-") === 0 || r === "color" || r === "shape" ? "fueltype" : r.replace(/-steps$/, "").replace(/^(crash|stop)$/, "sos"))));
+    for (var i = 0; i < as.length; i++) as[i].setAttribute("aria-current", String(as[i].getAttribute("data-m") === (r.indexOf("lamp-") === 0 || r === "color" || r === "shape" ? "fueltype" : r.replace(/-steps$/, "").replace(/^(crash|stop)$/, "sos").replace(/^(gas|charge|wash)$/, "nearby"))));
   }
   function go(v) { if (route() === v) { render(); window.scrollTo(0, 0); } else location.hash = v; }
   window.addEventListener("hashchange", function () { render(); window.scrollTo(0, 0); });
