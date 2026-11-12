@@ -304,6 +304,7 @@ body { background: var(--page); }
 .install span { font-size: 14px; color: var(--muted); }
 .install #installHelp { grid-column: 1 / -1; font-size: 14.5px; }
 .install #installHelp:empty { display: none; }
+.install .tip { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: var(--page); color: var(--ink); }
 .install ol { list-style: decimal; padding-left: 20px; display: grid; gap: 4px; }
 @media (max-width: 420px) { .install { grid-template-columns: 1fr; } .install .btn { width: 100%; } }
 
@@ -320,6 +321,11 @@ body { background: var(--page); }
 .prow em { font-style: normal; font-weight: 800; font-size: 16px; color: var(--ink); text-align: right; white-space: nowrap; }
 .prow em { color: var(--link); }
 @media (max-width: 420px) { .prow { padding: 12px 14px; } .prow em { font-size: 15px; } }
+
+.tiles { grid-template-rows: repeat(2, 1fr) auto; }
+.tiles .tile:not(.wide) { height: 100%; min-height: 156px; }
+.tile.wide i.logos { height: auto; gap: 4px; min-width: 96px; }
+@media (min-width: 861px) { .tiles { grid-template-rows: 1fr auto; } }
 
 @media (max-width: 860px) {
   .nav { display: none; }
@@ -462,20 +468,16 @@ body { background: var(--page); }
   })();
   /* ---- 홈 화면에 추가 ---- */
   var deferredPrompt = null;
-  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; var b = $("installBox"); if (b) b.outerHTML = installCard(); });
-  window.addEventListener("appinstalled", function () { deferredPrompt = null; var b = $("installBox"); if (b) b.remove(); toast("홈 화면에 추가했습니다."); });
+  /* 바로 설치할 수 있는 브라우저(안드로이드 Chrome·삼성 인터넷 등)에서만 버튼을 보여 줍니다 */
   function isStandalone() { try { return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch (e) { return false; } }
-  function installCard() {
-    if (isStandalone()) return "";
-    return '<section class="card install" id="installBox">' + (window.__escNote ? '<p class="err" style="grid-column:1/-1">' + window.__escNote + "</p>" : "") + '<div><b>홈 화면에 내 차 도우미 두기</b><span>앱처럼 바로 열립니다. 설치할 것도, 가입도 없습니다.</span></div><button type="button" class="btn p" id="goInstall">홈 화면에 추가</button><div id="installHelp"></div></section>';
+  function installInner() {
+    if (!deferredPrompt || isStandalone()) return "";
+    return '<section class="card install" id="installBox"><div><b>홈 화면에 내 차 도우미 두기</b><span>앱처럼 바로 열립니다. 가입은 없습니다.</span></div><button type="button" class="btn p" id="goInstall">홈 화면에 추가</button></section>';
   }
-  function installHelp() {
-    var ua = navigator.userAgent || "", ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && "ontouchend" in document);
-    var inapp = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(ua);
-    if (inapp) return '<p><b>카카오톡·네이버 앱 안에서는 추가할 수 없습니다.</b> 오른쪽 위(또는 아래) 메뉴에서 <b>' + (ios ? "Safari로 열기" : "다른 브라우저로 열기(Chrome)") + "</b>를 누른 뒤 다시 시도해 주세요.</p>";
-    if (ios) return "<ol><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b>(네모에 위쪽 화살표)을 누릅니다.</li><li>목록을 내려 <b>홈 화면에 추가</b>를 누릅니다.</li><li>오른쪽 위 <b>추가</b>를 누르면 끝입니다.</li></ol>";
-    return "<ol><li>Chrome 오른쪽 위 <b>점 세 개(⋮)</b> 메뉴를 누릅니다.</li><li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b>를 누릅니다.</li><li><b>추가</b>(설치)를 누르면 끝입니다.</li></ol>";
-  }
+  function installCard() { return '<div id="installSlot">' + installInner() + "</div>"; }
+  function paintInstall() { var s = $("installSlot"); if (s) s.innerHTML = installInner(); }
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; paintInstall(); });
+  window.addEventListener("appinstalled", function () { deferredPrompt = null; paintInstall(); toast("홈 화면에 추가했습니다."); });
   if ("serviceWorker" in navigator && /^https:$/.test(location.protocol)) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
   function head(step, total, back) {
     return '<div class="stepbar"><a class="back" href="#' + back + '">‹ 뒤로</a>' + (total ? '<span class="prog num">' + step + " / " + total + "</span>" : "") + "</div>" +
@@ -494,11 +496,11 @@ body { background: var(--page); }
     var pop = ["engine", "tpms", "oil", "coolant", "battery"].map(function (id) { return '<a href="#lamp-' + id + '">' + esc(lampOf(id).name) + "</a>"; }).join("");
     return '<section class="hero"><div class="in"><h1>내 차 도우미</h1>' +
       '<div class="tiles">' +
-      '<a class="tile" href="https://hyundaicar.kr" target="_blank" rel="noopener">' + LOGOS + "<b>신차 상담<br>중고차 정리</b><small>hyundaicar.kr에서 상담하기</small></a>" +
+      '<a class="tile" href="#parts"><i>' + TI.wrench + "</i><b>소모품 교환 주기</b><small>엔진오일·필터·타이어 등</small></a>" +
       '<a class="tile" href="#sos"><i>' + TI.sos + "</i><b>사고·긴급</b><small>할 일 순서 · 119 · 112</small></a>" +
       '<a class="tile" href="#nearby"><i>' + TI.pump + "</i><b>주유·충전·세차</b><small>주변 최저가 · 충전소 · 세차 날씨</small></a>" +
       '<a class="tile" href="#fueltype"><i>' + TI.gauge + '</i><b>경고등 뜻</b><small>색과 모양으로 찾기 · <span class="num">' + LAMPS.length + "</span>가지</small></a>" +
-      '<a class="tile wide" href="#parts"><i>' + TI.wrench + "</i><span class=\"tw\"><b>소모품 교환 주기</b><small>엔진오일·필터·타이어 등 부품별 교환 시기</small></span></a>" +
+      '<a class="tile wide" href="https://hyundaicar.kr" target="_blank" rel="noopener">' + LOGOS + "<span class=\"tw\"><b>신차 상담 · 중고차 정리</b><small>hyundaicar.kr에서 상담하기</small></span></a>" +
       "</div></div></section>" +
       '<div class="in home2"><label class="flbl" for="lampQ">계기판에 켜진 불, 이름으로 찾기</label>' +
       '<input class="search" id="lampQ" type="search" placeholder="예: 엔진, 타이어, 배터리" autocomplete="off"><div id="findr" aria-live="polite"></div>' +
@@ -781,8 +783,10 @@ body { background: var(--page); }
     if (t.id === "goWx") { loadWx(); return; }
     if (t.id === "goEv") { loadEv(); return; }
     if (t.id === "goInstall") {
-      if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; }); return; }
-      var hp = $("installHelp"); if (hp) hp.innerHTML = installHelp(); return;
+      if (!deferredPrompt) return;
+      var p = deferredPrompt; deferredPrompt = null;
+      p.prompt(); p.userChoice.then(function () { paintInstall(); }).catch(function () { paintInstall(); });
+      return;
     }
     if ((x = t.closest("[data-evf]"))) { near.evFast = x.getAttribute("data-evf") === "1"; redrawNear(); loadEvStat(); return; }
     if ((x = t.closest("[data-prod]"))) { near.prod = x.getAttribute("data-prod"); try { localStorage.setItem("carhelp_prod", near.prod); } catch (err) {} if (near.fuel) loadFuel(); else redrawNear(); return; }
